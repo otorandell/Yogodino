@@ -1,15 +1,22 @@
 package com.myproject.yogodino;
 
+import java.io.File;
+
 import com.myproject.cardmanagement.Carta;
 import com.myproject.cardmanagement.Coleccion;
 import com.myproject.cardmanagement.DraftPack;
 import com.myproject.cardmanagement.Mazo;
 import com.myproject.logsystem.LogEvents;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.Resource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
@@ -44,17 +51,22 @@ public class YogodinoDraftLayout {
 		HorizontalLayout elecciones = new HorizontalLayout();
 		VerticalLayout runnerlayout = new VerticalLayout();
 		VerticalLayout corplayout = new VerticalLayout();
-		Image runner = new Image("Runner",
-			    new ClassResource("file//C:/themasque.jpg"));
+		String basepath = VaadinService.getCurrent()
+                .getBaseDirectory().getAbsolutePath();
+FileResource masqueresource = new FileResource(new File(basepath +
+                      "/WEB-INF/images/themasque.jpg"));
+Image masque = new Image("", masqueresource);
+
 		Button runnerbutton = new Button("Runner",
 			    event -> draftStart(content, layout, true));
-		Image corp = new Image("Corp",
-			    new ClassResource("file//C:/theshadow.png"));
+		FileResource shadowresource = new FileResource(new File(basepath +
+                "/WEB-INF/images/theshadow.png"));
+Image shadow = new Image("", shadowresource);
 		Button corpbutton = new Button("Corp",
 			    event -> draftStart(content, layout, false));
-		runnerlayout.addComponent(runner);
+		runnerlayout.addComponent(masque);
+		corplayout.addComponent(shadow);
 		runnerlayout.addComponent(runnerbutton);
-		corplayout.addComponent(corp);
 		corplayout.addComponent(corpbutton);
 		elecciones.addComponent(runnerlayout);
 		elecciones.addComponent(corplayout);
@@ -101,23 +113,37 @@ public class YogodinoDraftLayout {
 		VerticalLayout segundoslot = new VerticalLayout();
 		VerticalLayout tercerslot = new VerticalLayout();
 		
-		Label primera =new Label(draftpack.getIniciales().get(iteracion)[0].getNombre());
+		/*Label primera =new Label(draftpack.getIniciales().get(iteracion)[0].getNombre());
 		Button runnerbutton = new Button(draftpack.getIniciales().get(iteracion)[0].getNombre(),
 			    event -> siguiente(iteracion, layout, draft, draftpack.getIniciales().get(iteracion)[0]));
 		primerslot.addComponent(primera);
+		primerslot.addComponent(runnerbutton);*/
+		String basepath = VaadinService.getCurrent()
+                .getBaseDirectory().getAbsolutePath();
+		FileResource primera = new FileResource(new File(basepath +
+        "/WEB-INF/images/"+draftpack.getIniciales().get(iteracion)[0].getNombre()+".png"));
+		Image imagenprimera = new Image("", primera);
+		Button runnerbutton = new Button(draftpack.getIniciales().get(iteracion)[0].getNombre(),
+			    event -> siguiente(iteracion, layout, draft, draftpack.getIniciales().get(iteracion)[0]));
+		primerslot.addComponent(imagenprimera);
 		primerslot.addComponent(runnerbutton);
 		
-		Label segona =new Label(draftpack.getIniciales().get(iteracion)[1].getNombre());
+		
+		FileResource segona = new FileResource(new File(basepath +
+		        "/WEB-INF/images/"+draftpack.getIniciales().get(iteracion)[1].getNombre()+".png"));
+				Image imagensegona = new Image("", segona);
 		Button runnerbutton2 = new Button(draftpack.getIniciales().get(iteracion)[1].getNombre(),
 			    event -> siguiente(iteracion, layout, draft, draftpack.getIniciales().get(iteracion)[1]));
-		segundoslot.addComponent(segona);
+		segundoslot.addComponent(imagensegona);
 		segundoslot.addComponent(runnerbutton2);
 
 		
-		Label tercera =new Label(draftpack.getIniciales().get(iteracion)[2].getNombre());
+		FileResource tercera = new FileResource(new File(basepath +
+		        "/WEB-INF/images/"+draftpack.getIniciales().get(iteracion)[2].getNombre()+".png"));
+				Image imagentercera = new Image("", tercera);
 		Button runnerbutton3 = new Button(draftpack.getIniciales().get(iteracion)[2].getNombre(),
 			    event -> siguiente(iteracion, layout, draft, draftpack.getIniciales().get(iteracion)[2]));
-		tercerslot.addComponent(tercera);
+		tercerslot.addComponent(imagentercera);
 		tercerslot.addComponent(runnerbutton3);
 
 		

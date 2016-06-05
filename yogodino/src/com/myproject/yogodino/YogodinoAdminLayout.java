@@ -10,20 +10,92 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 public class YogodinoAdminLayout {
+	LogEvents logevents;
+
 
 public YogodinoAdminLayout(){}
 	
-	public VerticalLayout mostrarpaneladmin(){
+	public VerticalLayout mostrarpaneladmin(LogEvents logevents){
+		this.logevents = logevents;
 		VerticalLayout screen = new VerticalLayout();
 		VerticalLayout addcarta = nuevacarta();
 		VerticalLayout addusuario = nuevousuario();
+		VerticalLayout cambiacontraseña = cambiacontraseña();
+		VerticalLayout añadenotificacion = añadenotificacion();
 		screen.addComponent(addusuario);
-		screen.addComponent(addcarta);		
+		screen.addComponent(addcarta);
+		screen.addComponent(cambiacontraseña);
+		screen.addComponent(añadenotificacion);
 		return screen;
+	}
+
+	private VerticalLayout cambiacontraseña() {
+	VerticalLayout retorno = new VerticalLayout();
+	HorizontalLayout cadenatextbox = new HorizontalLayout();
+	Label ayuda = new Label("Puedes cambiar la contraseña de alguien aqui: ");
+	ComboBox usuarios = ComboUsuarios();
+	TextField nuevapass = new TextField("Nueva Contraseña: ");
+	Button confirma = new Button("Cambia",
+		    event -> cambiaContraseña(retorno, usuarios, nuevapass));
+	
+	cadenatextbox.addComponent(usuarios);
+	cadenatextbox.addComponent(nuevapass);
+	cadenatextbox.addComponent(confirma);
+	retorno.addComponent(ayuda);
+	retorno.addComponent(cadenatextbox);	
+	
+	return retorno;
+	}
+	
+	private VerticalLayout añadenotificacion() {
+		VerticalLayout retorno = new VerticalLayout();
+		HorizontalLayout cadenatextbox = new HorizontalLayout();
+		Label ayuda = new Label("Puedes añadir noticias recientes aqui: ");
+		TextArea nuevomensaje = new TextArea();
+		Button confirma = new Button("Añade",
+			    event -> añadenuevoMensaje(retorno, nuevomensaje, this.logevents));
+		
+		cadenatextbox.addComponent(nuevomensaje);
+		cadenatextbox.addComponent(confirma);
+		retorno.addComponent(ayuda);
+		retorno.addComponent(cadenatextbox);	
+		
+		return retorno;
+		}
+	
+	private void añadenuevoMensaje(VerticalLayout retorno, TextArea nuevomensaje, LogEvents logevents) {
+		ConnectionDDBB connection = new ConnectionDDBB();
+		connection.dbConnect("jdbc:mysql://localhost:3306/yogodino","root","admin");
+		String seleccion = nuevomensaje.getValue().toString();
+		connection.addMensaje(seleccion, logevents.getId());
+		connection.closeConnection();
+	}
+
+	private void cambiaContraseña(VerticalLayout retorno, ComboBox usuarios, TextField nuevapass) {
+		ConnectionDDBB connection = new ConnectionDDBB();
+		connection.dbConnect("jdbc:mysql://localhost:3306/yogodino","root","admin");
+		String seleccion = usuarios.getValue().toString();
+		String contraseña = nuevapass.getValue().toString();
+		connection.updateUsuario(seleccion, contraseña);
+		
+	}
+
+	private ComboBox ComboUsuarios() {
+		ConnectionDDBB connection = new ConnectionDDBB();
+		connection.dbConnect("jdbc:mysql://localhost:3306/yogodino","root","admin");
+		List<String> todousuarios = connection.getAllUsers();
+	    ComboBox combobox = new ComboBox("Lista Usuarios:  ");
+	    for(int i =0; i< todousuarios.size();i++){
+	    	combobox.addItem(todousuarios.get(i));
+	    }
+	    connection.closeConnection();
+	    return combobox;
+
 	}
 
 	private VerticalLayout nuevacarta() {

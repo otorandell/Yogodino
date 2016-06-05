@@ -1,5 +1,9 @@
 package com.myproject.yogodino;
 
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.annotation.WebServlet;
 
 import com.myproject.cardmanagement.Carta;
@@ -86,13 +90,30 @@ public class YogodinoUI extends UI {
 		Button button = new Button("Entra",
 			    event -> checkLogIn(loginscreen, layout, logevents, inputnombre, inputpass));
 			
+		VerticalLayout novedades = novedades();
+		
 		loginscreen.addComponent(button);
+		loginscreen.addComponent(novedades);
 		setContent(loginscreen);
 		layout.addComponent(loginscreen);
 		setContent(layout);
 
 		
 	}
+	private VerticalLayout novedades() {
+		VerticalLayout retorno = new VerticalLayout();
+		Label novedades = new Label("Novedades: ");
+		retorno.addComponent(novedades);
+		 ConnectionDDBB connection = new ConnectionDDBB();
+			connection.dbConnect("jdbc:mysql://localhost:3306/yogodino","root","admin");
+		List<Label> listanovedades= connection.todasLasNovedades();
+		for(int i =0; i<listanovedades.size();i++){
+			retorno.addComponent(listanovedades.get(i));
+		}
+		connection.closeConnection();
+		return retorno;
+	}
+
 	private void loggedIn(VerticalLayout layout, LogEvents logevents){
 		HorizontalLayout logs = new HorizontalLayout();
 		Label welcome = new Label("Usuario actual: "+logevents.getUsername());
@@ -132,7 +153,7 @@ public class YogodinoUI extends UI {
 	public void adminLayout(VerticalLayout layout){
 		layout.removeAllComponents();
 		this.yogodinoadminlayout = new YogodinoAdminLayout();
-		layout.addComponent(this.yogodinoadminlayout.mostrarpaneladmin());
+		layout.addComponent(this.yogodinoadminlayout.mostrarpaneladmin(this.logevents));
 	}
 	public void mazosLayout(VerticalLayout layout){
 		layout.removeAllComponents();

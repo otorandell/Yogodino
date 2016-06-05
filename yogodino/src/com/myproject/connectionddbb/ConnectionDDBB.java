@@ -1,13 +1,17 @@
 package com.myproject.connectionddbb;
 
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.myproject.cardmanagement.Coleccion;
 import com.myproject.cardmanagement.InstanciasCarta;
 import com.myproject.cardmanagement.Mazo;
 import com.myproject.logsystem.LogEvents;
+import com.vaadin.ui.Label;
 
 public class ConnectionDDBB {
     Connection conn;
@@ -321,4 +325,79 @@ private String setsubtipoid(String subtipo) {
 	
 	return subtipo;
 }
+public List<String> getAllUsers(){
+	String query = "select nombre from usuarios";
+	Statement stmt;
+	 List<String[]> usuarios = new ArrayList<>();
+	 List<String> usuariosfinal = new ArrayList<>();
+    try {
+    	
+        stmt = this.conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        while (rs.next()) {
+        	usuarios.add(new String[]{rs.getString(1)}); 
+        }
+       
+        for (int i = 0; i< usuarios.size();i++){
+        usuariosfinal.add(usuarios.get(i)[0]);
+        }
+	    stmt.close();
+
+}
+    catch (SQLException e ) {
+		e.printStackTrace();
+	} 
+    return usuariosfinal;
+}
+public void updateUsuario(String seleccion, String nueva){
+
+	 
+	 String query = "UPDATE `yogodino`.`usuarios` SET `PASSWORD`='"+nueva+"' WHERE `NOMBRE`='"+seleccion+"';";
+	
+	try{
+        Statement sta=this.getConn().createStatement();
+        if (sta.execute(query))
+            sta.close();}
+    catch(Exception e){
+        String ecode = "--ERROR: updateTable(): Unable to update data from DB, please check the status.";
+        e.printStackTrace();
+    }
+}
+
+public void addMensaje(String mensaje, String userid){
+	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+	Calendar cal = Calendar.getInstance();
+	String today = dateFormat.format(cal.getTime()); 
+	 
+	 String query = "INSERT INTO `yogodino`.`mensajes` (`FECHA`, `CONTENIDO`, `USUARIOID`) VALUES ('"+today+"', '"+mensaje+"', '"+userid+"');";
+	
+	try{
+        Statement sta=this.getConn().createStatement();
+        if (sta.execute(query))
+            sta.close();}
+    catch(Exception e){
+        String ecode = "--ERROR: updateTable(): Unable to update data from DB, please check the status.";
+        e.printStackTrace();
+    }
+}
+public List<Label> todasLasNovedades(){
+	String query = "select * from mensajes";
+	Statement stmt;
+	 List<Label> mensajes = new ArrayList<>();
+    try {
+    	
+        stmt = this.conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        while (rs.next()) {
+        	mensajes.add(new Label(rs.getDate(2).toString()+": "+rs.getString(3))); 
+        }
+	    stmt.close();
+
+}
+    catch (SQLException e ) {
+		e.printStackTrace();
+	} 
+    return mensajes;
+}
+
 }
